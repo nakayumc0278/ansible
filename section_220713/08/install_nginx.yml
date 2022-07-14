@@ -1,0 +1,36 @@
+---
+  - hosts: node02
+    gather_facts: false
+    become: true
+
+    vars:
+      httpd_package_name: httpd
+      httpd_service_name: httpd.service
+
+    tasks:
+      - name: install yum package
+        ansible.builtin.yum:
+          name: 
+            - epel-release
+            - "{{ httpd_package_name }}"
+          state: present
+      
+      - name: start httpd service
+        ansible.builtin.systemd:
+          name: "{{ httpd_service_name }}"
+          state: started
+          enabled: true
+      
+      - name: firewall open 80/tcp
+        ansible.builtin.firewalld:
+          service: http
+          state: enabled
+          permanent: true
+        notify: restart firewalld
+    
+    handlers:
+      - name: restart firewalld
+        service:
+          name: firewalld
+          state: restarted
+          enabled: true

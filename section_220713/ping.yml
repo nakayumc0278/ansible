@@ -1,0 +1,7 @@
+---
+- hosts: node
+  become: false
+
+  tasks:
+    - name: test tasks
+      ansible.builtin.ping:
